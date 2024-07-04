@@ -83,31 +83,31 @@ b_io_fd b_open (char * filename, int flags)
 	{
 
     if (startup == 0) b_init();	  //Initialize our system
-	// get a free fcb
+    // get a free fcb
     b_io_fd fd = b_getFCB();
-	// error if no fcb is available
+    // error if no fcb is available
     if (fd == -1) return -1;
-	// retrieve file info
+    // retrieve file info
     fileInfo *fi = GetFileInfo(filename);
     if (fi == NULL) {
         fcbArray[fd].fi = NULL;
         return -1;
     }
 
-	// assign file info to the fcb
+    // assign file info to the fcb
     fcbArray[fd].fi = fi;
-	// allocate buffer
+    // allocate buffer
     fcbArray[fd].buffer = malloc(B_CHUNK_SIZE);
     if (fcbArray[fd].buffer == NULL) {
         fcbArray[fd].fi = NULL;
         return -1;
     }
-	// initialize buffer position
+    // initialize buffer position
     fcbArray[fd].bufferPosition = 0;
-	// initialize file position
+    // initialize file position
     fcbArray[fd].filePosition = 0;
 
-	// return file descriptor
+    // return file descriptor
     return fd;
 }
 
@@ -123,15 +123,15 @@ int b_read (b_io_fd fd, char * buffer, int count) {
     if ((fd < 0) || (fd >= MAXFCBS) || (fcbArray[fd].fi == NULL)) {
         return -1;
     }
-	// total bytes read
+    // total bytes read
     int bytesRead = 0;
     while (count > 0) {
-		// read a new chunk from the file
+	    // read a new chunk from the file
         if (fcbArray[fd].bufferPosition >= B_CHUNK_SIZE || fcbArray[fd].bufferPosition == 0) {
-			// number of blocks to read
+		    // number of blocks to read
             int blocksToRead = 1;
             if (fcbArray[fd].filePosition + B_CHUNK_SIZE > fcbArray[fd].fi->fileSize) {
-				// adjust blocksToRead if goes beyond the EOF
+			    // adjust blocksToRead if goes beyond the EOF
                 blocksToRead = (fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition + 
 					B_CHUNK_SIZE - 1) / B_CHUNK_SIZE;
             }
@@ -139,14 +139,14 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 						fcbArray[fd].fi->location + (fcbArray[fd].filePosition / B_CHUNK_SIZE));
 			// no more data
             if (blocksRead == 0) break;
-			// reset buffer position
+		    // reset buffer position
             fcbArray[fd].bufferPosition = 0;
         }
 
         int bytesToCopy = B_CHUNK_SIZE - fcbArray[fd].bufferPosition;
         if (bytesToCopy > count) bytesToCopy = count;
         if (bytesToCopy > fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition) {
-			// adjust bytesToCopy if goes beyond the EOF
+		    // adjust bytesToCopy if goes beyond the EOF
             bytesToCopy = fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition;
         }
 
@@ -156,7 +156,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
         bytesRead += bytesToCopy;
         fcbArray[fd].bufferPosition += bytesToCopy;
         fcbArray[fd].filePosition += bytesToCopy;
-		// end of file
+	    // end of file
         if (fcbArray[fd].filePosition >= fcbArray[fd].fi->fileSize) break;
     }
 
@@ -170,9 +170,9 @@ int b_close (b_io_fd fd)
     if ((fd < 0) || (fd >= MAXFCBS) || (fcbArray[fd].fi == NULL)) {
         return -1;
     }
-	// free buffer
+    // free buffer
     free(fcbArray[fd].buffer);
-	// mark fcb as free
+    // mark fcb as free
     fcbArray[fd].fi = NULL;
 
     return 0;
