@@ -117,8 +117,7 @@ b_io_fd b_open (char * filename, int flags)
 // The return value is the number of bytes you have copied into their buffer.
 // The return value can never be greater then the requested count, but it can
 // be less only when you have run out of bytes to read.  i.e. End of File	
-int b_read (b_io_fd fd, char * buffer, int count)
- 	{
+int b_read (b_io_fd fd, char * buffer, int count) {
     if (startup == 0) b_init();	  //Initialize our system
 
     if ((fd < 0) || (fd >= MAXFCBS) || (fcbArray[fd].fi == NULL)) {
@@ -133,7 +132,8 @@ int b_read (b_io_fd fd, char * buffer, int count)
             int blocksToRead = 1;
             if (fcbArray[fd].filePosition + B_CHUNK_SIZE > fcbArray[fd].fi->fileSize) {
 				// adjust blocksToRead if goes beyond the EOF
-                blocksToRead = (fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition + B_CHUNK_SIZE - 1) / B_CHUNK_SIZE;
+                blocksToRead = (fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition + 
+					B_CHUNK_SIZE - 1) / B_CHUNK_SIZE;
             }
             uint64_t blocksRead = LBAread(fcbArray[fd].buffer, blocksToRead, 
 						fcbArray[fd].fi->location + (fcbArray[fd].filePosition / B_CHUNK_SIZE));
