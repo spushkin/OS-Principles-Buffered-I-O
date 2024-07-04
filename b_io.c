@@ -126,27 +126,27 @@ int b_read (b_io_fd fd, char * buffer, int count) {
     // total bytes read
     int bytesRead = 0;
     while (count > 0) {
-	    // read a new chunk from the file
+        // read a new chunk from the file
         if (fcbArray[fd].bufferPosition >= B_CHUNK_SIZE || fcbArray[fd].bufferPosition == 0) {
-		    // number of blocks to read
+            // number of blocks to read
             int blocksToRead = 1;
             if (fcbArray[fd].filePosition + B_CHUNK_SIZE > fcbArray[fd].fi->fileSize) {
-			    // adjust blocksToRead if goes beyond the EOF
+                // adjust blocksToRead if goes beyond the EOF
                 blocksToRead = (fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition + 
 					B_CHUNK_SIZE - 1) / B_CHUNK_SIZE;
             }
             uint64_t blocksRead = LBAread(fcbArray[fd].buffer, blocksToRead, 
 						fcbArray[fd].fi->location + (fcbArray[fd].filePosition / B_CHUNK_SIZE));
-			// no more data
+            // no more data
             if (blocksRead == 0) break;
-		    // reset buffer position
+            // reset buffer position
             fcbArray[fd].bufferPosition = 0;
         }
 
         int bytesToCopy = B_CHUNK_SIZE - fcbArray[fd].bufferPosition;
         if (bytesToCopy > count) bytesToCopy = count;
         if (bytesToCopy > fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition) {
-		    // adjust bytesToCopy if goes beyond the EOF
+            // adjust bytesToCopy if goes beyond the EOF
             bytesToCopy = fcbArray[fd].fi->fileSize - fcbArray[fd].filePosition;
         }
 
@@ -156,7 +156,7 @@ int b_read (b_io_fd fd, char * buffer, int count) {
         bytesRead += bytesToCopy;
         fcbArray[fd].bufferPosition += bytesToCopy;
         fcbArray[fd].filePosition += bytesToCopy;
-	    // end of file
+        // end of file
         if (fcbArray[fd].filePosition >= fcbArray[fd].fi->fileSize) break;
     }
 
