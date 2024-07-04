@@ -30,10 +30,12 @@
 // It contains a pointer to a fileInfo strucutre and any other information
 // that you need to maintain your open file.
 typedef struct b_fcb {
+    
     fileInfo * fi; //holds the low level systems file info
     char *buffer; // buffer for file I/O
     int bufferPosition; // current position in the buffer
     int filePosition; // current position in the file
+    
 } b_fcb;
 	
 //static array of file control blocks
@@ -79,8 +81,7 @@ b_io_fd b_getFCB ()
 // array of file control blocks (fcbArray) that you maintain for each open file.  
 // For this assignment the flags will be read only and can be ignored.
 
-b_io_fd b_open (char * filename, int flags) 
-	{
+b_io_fd b_open (char * filename, int flags) {
 
     if (startup == 0) b_init();	  //Initialize our system
     // get a free fcb
@@ -92,6 +93,7 @@ b_io_fd b_open (char * filename, int flags)
     if (fi == NULL) {
         fcbArray[fd].fi = NULL;
         return -1;
+
     }
 
     // assign file info to the fcb
@@ -118,6 +120,7 @@ b_io_fd b_open (char * filename, int flags)
 // The return value can never be greater then the requested count, but it can
 // be less only when you have run out of bytes to read.  i.e. End of File	
 int b_read (b_io_fd fd, char * buffer, int count) {
+
     if (startup == 0) b_init();	  //Initialize our system
 
     if ((fd < 0) || (fd >= MAXFCBS) || (fcbArray[fd].fi == NULL)) {
@@ -165,8 +168,8 @@ int b_read (b_io_fd fd, char * buffer, int count) {
 
 // b_close frees and allocated memory and places the file control block back 
 // into the unused pool of file control blocks.
-int b_close (b_io_fd fd) 
-{
+int b_close (b_io_fd fd) {
+
     if ((fd < 0) || (fd >= MAXFCBS) || (fcbArray[fd].fi == NULL)) {
         return -1;
     }
@@ -176,5 +179,6 @@ int b_close (b_io_fd fd)
     fcbArray[fd].fi = NULL;
 
     return 0;
+    
 }
 	
